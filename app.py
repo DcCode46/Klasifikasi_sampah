@@ -49,40 +49,60 @@ with tab1:
     st.write("Aplikasi ini dapat memprediksi jenis sampah dan kategori utamanya.")
 
     st.subheader("Jenis Sampah yang Bisa Diprediksi")
-    
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image("images/Sisa_Buah_dan_Sayur.jpg", caption="Sisa Buah & Sayur (Organik)", use_container_width=True)
-        st.image("images/Sisa_Makanan.jpg", caption="Sisa Makanan (Organik)", use_container_width=True)
-        st.image("images/Alumunium.jpg", caption="Alumunium (Anorganik)", use_container_width=True)
+        st.image("Sisa_Buah_dan_Sayur.jpg", caption="Sisa Buah & Sayur (Organik)", use_container_width=True)
+        st.image("Sisa_Makanan.jpg", caption="Sisa Makanan (Organik)", use_container_width=True)
+        st.image("Alumunium.jpg", caption="Alumunium (Anorganik)", use_container_width=True)
+        st.image("Alat_Pembersih_Kimia.jpg", caption="Alat Pembersih Kimia (B3)", use_container_width=True)
+        st.image("Karet.jpeg", caption="Karet (Anorganik)", use_container_width=True)
+
     with col2:
-        st.image("images/Kaca.jpg", caption="Kaca (Anorganik)", use_container_width=True)
-        st.image("images/Kardus.jpg", caption="Kardus (Anorganik)", use_container_width=True)
-        st.image("images/Kertas.jpg", caption="Kertas (Anorganik)", use_container_width=True)
+        st.image("Kaca.jpg", caption="Kaca (Anorganik)", use_container_width=True)
+        st.image("Kardus.jpg", caption="Kardus (Anorganik)", use_container_width=True)
+        st.image("Kertas.jpg", caption="Kertas (Anorganik)", use_container_width=True)
+        st.image("Lampu_dan_Elektronik.jpeg", caption="Lampu & Elektronik (B3)", use_container_width=True)
+        st.image("Minyak_dan_Oli_Bekas.jpeg", caption="Minyak & Oli Bekas (B3)", use_container_width=True)
+
     with col3:
-        st.image("images/Plastik.jpg", caption="Plastik (Anorganik)", use_container_width=True)
-        st.image("images/Baterai.jpg", caption="Baterai (B3)", use_container_width=True)
-        st.image("images/Obat_dan_Medis.jpg", caption="Obat & Medis (B3)", use_container_width=True)
+        st.image("Plastik.jpg", caption="Plastik (Anorganik)", use_container_width=True)
+        st.image("Baterai.jpg", caption="Baterai (B3)", use_container_width=True)
+        st.image("Obat_dan_Medis.jpg", caption="Obat & Medis (B3)", use_container_width=True)
+        st.image("Styrofoam.jpeg", caption="Styrofoam (Anorganik)", use_container_width=True)
+        st.image("Tekstil.jpg", caption="Tekstil (Anorganik)", use_container_width=True)
+
 
     st.info("Pastikan gambar yang diunggah jelas agar hasil prediksi akurat.")
 
 # ---------------- TAB PREDIKSI ----------------
 with tab2:
     st.title("🔍 Prediksi Sampah")
-    uploaded_file = st.file_uploader("Unggah gambar", type=["jpg", "jpeg", "png"])
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Gambar yang diunggah", use_container_width=True)
+    # Pilihan metode input
+    pilihan_input = st.radio("Pilih metode input gambar:", ["📁 Upload", "📷 Kamera"])
 
-        if st.button("Prediksi"):
-            img_array = preprocess_image(image)
-            predictions = model.predict(img_array)
-            pred_index = np.argmax(predictions)
-            subkelas_pred = class_names[pred_index]
-            kategori_pred = kategori_mapping[subkelas_pred]
-            confidence = predictions[0][pred_index] * 100
+    image = None
+    if pilihan_input == "📁 Upload":
+        uploaded_file = st.file_uploader("Unggah gambar", type=["jpg", "jpeg", "png"])
+        if uploaded_file is not None:
+            image = Image.open(uploaded_file).convert("RGB")
+            st.image(image, caption="Gambar yang diunggah", use_container_width=True)
 
-            st.success(f"**Subkelas:** {subkelas_pred}")
-            st.info(f"**Kategori Utama:** {kategori_pred}")
-            st.write(f"**Confidence:** {confidence:.2f}%")
+    elif pilihan_input == "📷 Kamera":
+        camera_file = st.camera_input("Ambil gambar dengan kamera")
+        if camera_file is not None:
+            image = Image.open(camera_file).convert("RGB")
+            st.image(image, caption="Gambar dari kamera", use_container_width=True)
+
+    # Tombol Prediksi
+    if image is not None and st.button("Prediksi"):
+        img_array = preprocess_image(image)
+        predictions = model.predict(img_array)
+        pred_index = np.argmax(predictions)
+        subkelas_pred = class_names[pred_index]
+        kategori_pred = kategori_mapping[subkelas_pred]
+        confidence = predictions[0][pred_index] * 100
+
+        st.success(f"**Subkelas:** {subkelas_pred}")
+        st.info(f"**Kategori Utama:** {kategori_pred}")
+        st.write(f"**Confidence:** {confidence:.2f}%")
